@@ -13,6 +13,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 import com.apbc.dao.AgentExtractedDetailsDAO;
 import com.apbc.dao.AgentExtractedTotalsDAO;
 import com.apbc.dao.AgentPayablesDAO;
+import com.apbc.dao.KnownAgentDAO;
 import com.apbc.dao.PayPeriodDAO;
 import com.apbc.dto.ExtractedAgentPaymentDetails;
 import com.apbc.dto.ExtractedAgentPaymentSummary;
@@ -32,20 +33,25 @@ public class ApplicationBean
 		PayPeriodDAO payperiod	= (PayPeriodDAO)ctx.getBean("payperiod"); 
 		AgentExtractedDetailsDAO extrDetails	= (AgentExtractedDetailsDAO)ctx.getBean("extractedpayables");
 		AgentExtractedTotalsDAO extrTotals	= (AgentExtractedTotalsDAO)ctx.getBean("extracttotals");
+		KnownAgentDAO agentDAO = (KnownAgentDAO)ctx.getBean("agentdao"); 
+
 		
 
 		
 		PayPeriod pp = getPayPeriodDuration(payperiod , payPeriod);
 		
-		List<ExtractedAgentPaymentDetails> payablesList = agentDao.getPayablesRow(pp);
-		List<ExtractedAgentPaymentSummary> payblesTotals = agentDao.getPayablesTotalRow(pp);
+		List<ExtractedAgentPaymentDetails> payablesList = agentDao.getPayablesRow(pp, agentDAO);
+		List<ExtractedAgentPaymentSummary> payblesTotals = agentDao.getPayablesTotalRow(pp, agentDAO);
 		System.out.println("Total Payables Records for this Run : "+payablesList.size());
 		
 		//NOW INSERT INTO AGENT EXTRACTED PAYMENT DETAILS TABLE AND SUMMARY TWO TABLES.
+		
 		for (ExtractedAgentPaymentDetails eap : payablesList)
 		{
 			extrDetails.insertAgentExtractedDetails(eap);
-			agentDao.updatePaymentStatus(eap.getAgent_id(), eap.getPolicyid());			
+			// IF STATUS IS DRY RUN THEN DO NOT CHANGE IT TO PAID FROM CREATED.
+			if (!mainRun.equalsIgnoreCase("test"))
+				agentDao.updatePaymentStatus(eap.getAgent_id(), eap.getPolicyid());			
 		}
 		// NOW INSERT INTO TOTALS RECORDS
 		for (ExtractedAgentPaymentSummary pd : payblesTotals)
