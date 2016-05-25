@@ -1,5 +1,7 @@
 
 package com.apbc.dao;
+import java.util.Date;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.apbc.dto.ExtractedAgentPaymentDetails;
@@ -109,6 +111,22 @@ public class AgentExtractedTotalsDAO {
 			System.out.println("Can not Insert data in Agent Extract Commissions Individual Table :"+eee.getMessage());
 		}
 		 System.out.println("Inserted into Agent Extract Commissions Individual Table Successfully");
+	}
+	
+	
+	//CLEAR
+	public void AgentExtractionTotalsClear(Date upto)
+	{
+		//pay_period_upto  '" + d3  payment_date <= '" + d3
+		try
+		{
+		String sql = "delete from from extracted_agent_payables_totals where pay_period_upto <= '"+upto;
+		template.execute(sql);
+		}
+		catch (Exception e)
+		{
+			System.out.println("CAN NOT ABLE TO DELETE extracted_agent_payables_totals BEFORE INSERTING ...THIS IS A CLEANING STEP");
+		}
 	}
 	}
 	

@@ -1,5 +1,7 @@
 
 package com.apbc.dao;
+import java.util.Date;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.apbc.dto.ExtractedAgentPaymentDetails;
@@ -13,6 +15,22 @@ public class AgentExtractedDetailsDAO {
 
 	public AgentExtractedDetailsDAO() {
 	}
+	// Clean upto extracted date everytime
+	public void AgentExtractionClear(Date upto)
+	{
+		//pay_period_upto  '" + d3  payment_date <= '" + d3
+		try
+		{
+		String sql = "delete from from extracted_agent_payables_details where pay_period_upto <= '"+upto;
+		template.execute(sql);
+		}
+		catch (Exception e)
+		{
+			System.out.println("CAN NOT ABLE TO DELETE EXTRACTED PAYMENTS SUMMARY BEFORE INSERTING ...THIS IS A CLEANING STEP");
+		}
+	}
+	
+
 	/**
 	 * RETURNS THE RANGE OF DATES
 	 * @param payPeriodId

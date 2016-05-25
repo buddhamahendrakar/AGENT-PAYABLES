@@ -106,14 +106,15 @@ GROUP BY agentId;
 where payment_date
 BETWEEN CAST('2016-01-01' AS DATE) AND CAST('2016-01-15' AS DATE)
 ;
-
+	 * @param lic TODO
 	 * @param i
 	 * @param j
+
 	 * @return
 	 */
 	
 	
-	public List<ExtractedAgentPaymentDetails> getPayablesRow(PayPeriod pp, final KnownAgentDAO agent) 
+	public List<ExtractedAgentPaymentDetails> getPayablesRow(PayPeriod pp, final KnownAgentDAO agent, final AgentLicenceDAO lic) 
 	{
 		Date d1 = pp.getFromDate();
 		Date d2 = pp.getToDate();
@@ -137,11 +138,15 @@ BETWEEN CAST('2016-01-01' AS DATE) AND CAST('2016-01-15' AS DATE)
 						e.setPayperiodupto(d3); //PAYPERIOD UP TO COMING FROM STATIC TABLE FOR GIVEN PAY PERIOD ID TODO
 						e.setPayperiod(Integer.valueOf(payperiodid)); //TODO FROM PAYPERIOD INPUT VALUE
 						//e.setAgent_name("TEST NAME"); //TODO GET AGENT NAME FROM AGENT TABLE BY PROVIDING ID;
-						getAgentName(agent, rs.getInt("agent_id"));
-						e.setAgentlicnum("LIC"); // TODO get from STATIC TABLE;
+						e.setAgent_name(getAgentName(agent, rs.getInt("agent_id")));
+						e.setAgentlicnum(getAgentLic(lic, rs.getInt("agent_id"))); // TODO get from agentlicensed table
 						e.setTrasactiontype(rs.getInt("transaction_type"));
 						e.setDesc("NORMAL");
 						return e;
+					}
+
+					private String getAgentLic(AgentLicenceDAO lic, int agentId) {
+						return lic.findByAgentId(Integer.valueOf(agentId));
 					}
 				});
 	}
@@ -151,7 +156,7 @@ BETWEEN CAST('2016-01-01' AS DATE) AND CAST('2016-01-15' AS DATE)
 where payment_date BETWEEN CAST('2016-01-01' AS DATE) AND CAST('2016-01-15' AS DATE) group by transaction_type;
 	 */
 	
-	public List<ExtractedAgentPaymentSummary> getPayablesTotalRow(PayPeriod pp, final KnownAgentDAO agent) 
+	public List<ExtractedAgentPaymentSummary> getPayablesTotalRow(PayPeriod pp, final KnownAgentDAO agent, final AgentLicenceDAO lic) 
 	{
 		Date d1 = pp.getFromDate();
 		Date d2 = pp.getToDate();
@@ -208,8 +213,7 @@ where payment_date BETWEEN CAST('2016-01-01' AS DATE) AND CAST('2016-01-15' AS D
 	protected String getAgentName(KnownAgentDAO agentDAO, int agentId) 
 	{
 		List<Agent> agents = agentDAO.getAgentIdsAndNames();
-		findAgentNameForId(agents, String.valueOf(agentId));
-		return null;
+		return findAgentNameForId(agents, String.valueOf(agentId));
 	}
 	
 	private String findAgentNameForId(List<Agent> agents, String agentId) {

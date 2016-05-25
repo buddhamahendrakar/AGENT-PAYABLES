@@ -32,6 +32,13 @@
 		<property name="template" ref="jdbcTemplate"></property>
 	</bean>
 	
+	<bean id="agentdao" class="com.apbc.dao.KnownAgentDAO">
+		<property name="template" ref="jdbcTemplate"></property>
+	</bean>
+		<bean id="agentlicdao" class="com.apbc.dao.AgentLicenceDAO">
+		<property name="template" ref="jdbcTemplate"></property>
+	</bean>
+	
 	<bean id="agentpayables" class="com.apbc.dao.AgentPayablesDAO">
 		<property name="template" ref="jdbcTemplate"></property>
 	</bean>
